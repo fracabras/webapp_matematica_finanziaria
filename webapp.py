@@ -1,6 +1,14 @@
 import streamlit as st
 
-st.title("Webapp per matematica finanziaria")
+st.title("Calcolatore di Matematica Finanziaria")
+
+# --- Toggle modalità ---
+modalita = st.radio(
+    "Modalità inserimento tasso",
+    ["Decimale (0.05)", "Percentuale (5%)"]
+)
+
+usa_percentuale = modalita == "Percentuale (5%)"
 
 # --- Scelta tasso ---
 tipo_tasso = st.selectbox(
@@ -8,33 +16,60 @@ tipo_tasso = st.selectbox(
     ["Effettivo (i già noto)", "Nominale (calcolo i effettivo)"]
 )
 
+# Funzione conversione
+def converti(val):
+    return val / 100 if usa_percentuale else val
+
+# --- Input tassi ---
 if tipo_tasso == "Effettivo (i già noto)":
-    i = st.number_input("Inserisci tasso effettivo i", value=0.05)
+    i_input = st.number_input(
+        "Inserisci tasso i",
+        value=5.0 if usa_percentuale else 0.05,
+        step=0.01 if usa_percentuale else 0.0001,
+        format="%.4f"
+    )
+    i = converti(i_input)
+
 else:
-    r = st.number_input("Tasso nominale r", value=0.05)
+    r_input = st.number_input(
+        "Tasso nominale r",
+        value=5.0 if usa_percentuale else 0.05,
+        step=0.01 if usa_percentuale else 0.0001,
+        format="%.4f"
+    )
     m = st.number_input("Numero di composizioni", value=1)
     I = st.number_input("Durata periodo (anni)", value=1.0)
+
+    r = converti(r_input)
     i = (1 + r/m)**(m*I) - 1
-    st.write(f"Tasso effettivo calcolato: {i:.4f}")
+
+    if usa_percentuale:
+        st.write(f"Tasso effettivo calcolato: {i*100:.4f}%")
+    else:
+        st.write(f"Tasso effettivo calcolato: {i:.6f}")
 
 # --- Orizzonte ---
 n = st.number_input("Orizzonte investimento (n)", value=1)
 
 # --- Fattori ---
-F_P = (1 + i)**n
-P_F = 1 / (1 + i)**n
-A_P = (i * (1 + i)**n) / ((1 + i)**n - 1) if i != 0 else 0
-P_A = ((1 + i)**n - 1) / (i * (1 + i)**n) if i != 0 else 0
-F_A = ((1 + i)**n - 1) / i if i != 0 else 0
-A_F = i / ((1 + i)**n - 1) if i != 0 else 0
+if i != 0:
+    F_P = (1 + i)**n
+    P_F = 1 / (1 + i)**n
+    A_P = (i * (1 + i)**n) / ((1 + i)**n - 1)
+    P_A = ((1 + i)**n - 1) / (i * (1 + i)**n)
+    F_A = ((1 + i)**n - 1) / i
+    A_F = i / ((1 + i)**n - 1)
+else:
+    F_P = P_F = A_P = P_A = F_A = A_F = 0
 
 st.subheader("Fattori")
-st.write(f"F/P = {F_P:.4f}")
-st.write(f"P/F = {P_F:.4f}")
-st.write(f"A/P = {A_P:.4f}")
-st.write(f"P/A = {P_A:.4f}")
-st.write(f"F/A = {F_A:.4f}")
-st.write(f"A/F = {A_F:.4f}")
+
+st.write(f"F/P = {F_P:.6f}")
+st.write(f"P/F = {P_F:.6f}")
+st.write(f"A/P = {A_P:.6f}")
+st.write(f"P/A = {P_A:.6f}")
+st.write(f"F/A = {F_A:.6f}")
+st.write(f"A/F = {A_F:.6f}")
 
 # --- Scelte ---
 inc = st.selectbox("Grandezza da calcolare", ["P", "F", "A"])
@@ -75,4 +110,9 @@ else:
     if risultato is not None:
         st.subheader("Risultato")
         st.write(formula)
+
+        if usa_percentuale:
+            st.success(f"{inc} = {risultato:.4f}")
+        else:
+            st.success(f"{inc} = {risultato:.6f}")
         st.success(f"{inc} = {risultato:.4f}")
