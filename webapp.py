@@ -37,8 +37,8 @@ else:
         step=0.01 if usa_percentuale else 0.0001,
         format="%.4f"
     )
-    m = st.number_input("Numero di composizioni", value=1)
-    I = st.number_input("Durata periodo (anni)", value=1.0)
+    m = st.number_input("Numero di composizioni m", value=1)
+    I = st.number_input("Durata periodo (anni) I", value=1.0)
 
     r = converti(r_input)
     i = (1 + r/m)**(m*I) - 1
