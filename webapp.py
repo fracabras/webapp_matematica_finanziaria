@@ -48,7 +48,7 @@ else:
         st.write(f"Tasso effettivo calcolato: {i:.4f}")
 
 # --- Orizzonte ---
-n = st.number_input("Orizzonte investimento (n)", value=1.0, format="%.4f")
+n = st.number_input("Orizzonte investimento (n)", value=1, step=1)
 
 # --- Fattori ---
 if i != 0:
