@@ -16,7 +16,6 @@ tipo_tasso = st.selectbox(
     ["Effettivo (i già noto)", "Nominale (calcolo i effettivo)"]
 )
 
-# Funzione conversione
 def converti(val):
     return val / 100 if usa_percentuale else val
 
@@ -37,8 +36,8 @@ else:
         step=0.01 if usa_percentuale else 0.0001,
         format="%.4f"
     )
-    m = st.number_input("Numero di composizioni m", value=1)
-    I = st.number_input("Durata periodo (anni) I", value=1.0)
+    m = st.number_input("Numero di composizioni m", value=1, step=1)
+    I = st.number_input("Durata periodo (anni) I", value=1.0, format="%.4f")
 
     r = converti(r_input)
     i = (1 + r/m)**(m*I) - 1
@@ -46,10 +45,10 @@ else:
     if usa_percentuale:
         st.write(f"Tasso effettivo calcolato: {i*100:.4f}%")
     else:
-        st.write(f"Tasso effettivo calcolato: {i:.6f}")
+        st.write(f"Tasso effettivo calcolato: {i:.4f}")
 
 # --- Orizzonte ---
-n = st.number_input("Orizzonte investimento (n)", value=1)
+n = st.number_input("Orizzonte investimento (n)", value=1.0, format="%.4f")
 
 # --- Fattori ---
 if i != 0:
@@ -64,12 +63,12 @@ else:
 
 st.subheader("Fattori")
 
-st.write(f"F/P = {F_P:.6f}")
-st.write(f"P/F = {P_F:.6f}")
-st.write(f"A/P = {A_P:.6f}")
-st.write(f"P/A = {P_A:.6f}")
-st.write(f"F/A = {F_A:.6f}")
-st.write(f"A/F = {A_F:.6f}")
+st.write(f"F/P = {F_P:.4f}")
+st.write(f"P/F = {P_F:.4f}")
+st.write(f"A/P = {A_P:.4f}")
+st.write(f"P/A = {P_A:.4f}")
+st.write(f"F/A = {F_A:.4f}")
+st.write(f"A/F = {A_F:.4f}")
 
 # --- Scelte ---
 inc = st.selectbox("Grandezza da calcolare", ["P", "F", "A"])
@@ -78,7 +77,7 @@ nota = st.selectbox("Grandezza nota", ["P", "F", "A"])
 if inc == nota:
     st.error("Non puoi scegliere la stessa variabile!")
 else:
-    val = st.number_input(f"Inserisci valore di {nota}", value=100.0)
+    val = st.number_input(f"Inserisci valore di {nota}", value=100.0, format="%.4f")
 
     risultato = None
     formula = ""
@@ -110,9 +109,4 @@ else:
     if risultato is not None:
         st.subheader("Risultato")
         st.write(formula)
-
-        if usa_percentuale:
-            st.success(f"{inc} = {risultato:.4f}")
-        else:
-            st.success(f"{inc} = {risultato:.6f}")
         st.success(f"{inc} = {risultato:.4f}")
