@@ -13,14 +13,14 @@ usa_percentuale = modalita == "Percentuale (5%)"
 # --- Scelta tasso ---
 tipo_tasso = st.selectbox(
     "Tipo di tasso",
-    ["Effettivo (i già noto)", "Nominale (calcolo i effettivo)"]
+    ["Effettivo ", "Nominale"]
 )
 
 def converti(val):
     return val / 100 if usa_percentuale else val
 
 # --- Input tassi ---
-if tipo_tasso == "Effettivo (i già noto)":
+if tipo_tasso == "Effettivo":
     i_input = st.number_input(
         "Inserisci tasso i",
         value=5.0 if usa_percentuale else 0.05,
@@ -37,7 +37,7 @@ else:
         format="%.4f"
     )
     m = st.number_input("Numero di composizioni m", value=1, step=1)
-    I = st.number_input("Durata periodo (anni) I", value=1.0, format="%.4f")
+    I = st.number_input("Durata periodo I", value=1.0, format="%.4f")
 
     r = converti(r_input)
     i = (1 + r/m)**(m*I) - 1
