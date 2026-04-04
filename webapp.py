@@ -31,7 +31,7 @@ if tipo_tasso == "Effettivo":
 
 else:
     r_input = st.number_input(
-        "i nominale", 
+        "tasso nominale r", 
         value=5.0 if usa_percentuale else 0.05,
         step=0.01 if usa_percentuale else 0.0001,
         format="%.4f"
