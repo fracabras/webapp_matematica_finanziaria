@@ -10,19 +10,19 @@ modalita = st.radio(
 
 usa_percentuale = modalita == "Percentuale (5%)"
 
-# --- Scelta tasso ---
+# --- Scelta tasso (Testo pulito come richiesto) ---
 tipo_tasso = st.selectbox(
     "Tipo di tasso",
-    ["Effettivo (i già noto)", "Nominale (calcolo i effettivo)"]
+    ["Effettivo", "Nominale"]
 )
 
 def converti(val):
     return val / 100 if usa_percentuale else val
 
 # --- Input tassi ---
-if tipo_tasso == "Effettivo (i già noto)":
+if tipo_tasso == "Effettivo":
     i_input = st.number_input(
-        "i effettivo nel periodo di composizione", # Etichetta aggiornata
+        "i effettivo nel periodo di composizione", 
         value=5.0 if usa_percentuale else 0.05,
         step=0.01 if usa_percentuale else 0.0001,
         format="%.4f"
@@ -31,23 +31,24 @@ if tipo_tasso == "Effettivo (i già noto)":
 
 else:
     r_input = st.number_input(
-        "i nominale", # Etichetta aggiornata
+        "i nominale", 
         value=5.0 if usa_percentuale else 0.05,
         step=0.01 if usa_percentuale else 0.0001,
         format="%.4f"
     )
     m = st.number_input("Numero di composizioni m", value=1, step=1)
-    I = st.number_input("I durata periodo temporale", value=1.0, format="%.4f") # Etichetta aggiornata
+    I = st.number_input("I durata periodo temporale", value=1.0, format="%.4f")
 
     r = converti(r_input)
+    # Calcolo del tasso effettivo i basato sulla formula del montante composto
     i = (1 + r/m)**(m*I) - 1
 
     if usa_percentuale:
-        st.write(f"Tasso effettivo calcolato: {i*100:.4f}%")
+        st.write(f"Tasso effettivo calcolato: **{i*100:.4f}%**")
     else:
-        st.write(f"Tasso effettivo calcolato: {i:.4f}")
+        st.write(f"Tasso effettivo calcolato: **{i:.4f}**")
 
-# --- Orizzonte (Forzato a Intero) ---
+# --- Orizzonte (Intero) ---
 n = st.number_input("Orizzonte investimento (n)", value=1, step=1)
 
 # --- Fattori ---
@@ -62,25 +63,23 @@ else:
     F_P = P_F = A_P = P_A = F_A = A_F = 0
 
 st.subheader("Fattori")
-
-# Layout a colonne per una visualizzazione più pulita
 col1, col2 = st.columns(2)
 with col1:
-    st.write(f"F/P = {F_P:.4f}")
-    st.write(f"P/F = {P_F:.4f}")
-    st.write(f"A/P = {A_P:.4f}")
+    st.write(f"F/P = **{F_P:.4f}**")
+    st.write(f"P/F = **{P_F:.4f}**")
+    st.write(f"A/P = **{A_P:.4f}**")
 with col2:
-    st.write(f"P/A = {P_A:.4f}")
-    st.write(f"F/A = {F_A:.4f}")
-    st.write(f"A/F = {A_F:.4f}")
+    st.write(f"P/A = **{P_A:.4f}**")
+    st.write(f"F/A = **{F_A:.4f}**")
+    st.write(f"A/F = **{A_F:.4f}**")
 
-# --- Scelte ---
+# --- Scelte Finali ---
 st.divider()
 inc = st.selectbox("Grandezza da calcolare", ["P", "F", "A"])
 nota = st.selectbox("Grandezza nota", ["P", "F", "A"])
 
 if inc == nota:
-    st.error("Non puoi scegliere la stessa variabile!")
+    st.error("La grandezza da calcolare deve essere diversa da quella nota.")
 else:
     val = st.number_input(f"Inserisci valore di {nota}", value=100.0, format="%.4f")
 
@@ -90,28 +89,28 @@ else:
     if inc == "F":
         if nota == "P":
             risultato = val * F_P
-            formula = "F = P * (F/P)"
+            formula = "F = P \\cdot (F/P)"
         elif nota == "A":
             risultato = val * F_A
-            formula = "F = A * (F/A)"
+            formula = "F = A \\cdot (F/A)"
 
     elif inc == "P":
         if nota == "F":
             risultato = val * P_F
-            formula = "P = F * (P/F)"
+            formula = "P = F \\cdot (P/F)"
         elif nota == "A":
             risultato = val * P_A
-            formula = "P = A * (P/A)"
+            formula = "P = A \\cdot (P/A)"
 
     elif inc == "A":
         if nota == "P":
             risultato = val * A_P
-            formula = "A = P * (A/P)"
+            formula = "A = P \\cdot (A/P)"
         elif nota == "F":
             risultato = val * A_F
-            formula = "A = F * (A/F)"
+            formula = "A = F \\cdot (A/F)"
 
     if risultato is not None:
         st.subheader("Risultato")
-        st.info(formula)
-        st.success(f"{inc} = {risultato:.4f}")
+        st.latex(formula)
+        st.success(f"**{inc} = {risultato:.4f}**")
