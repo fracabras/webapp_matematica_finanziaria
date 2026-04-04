@@ -13,16 +13,16 @@ usa_percentuale = modalita == "Percentuale (5%)"
 # --- Scelta tasso ---
 tipo_tasso = st.selectbox(
     "Tipo di tasso",
-    ["Effettivo ", "Nominale"]
+    ["Effettivo (i già noto)", "Nominale (calcolo i effettivo)"]
 )
 
 def converti(val):
     return val / 100 if usa_percentuale else val
 
 # --- Input tassi ---
-if tipo_tasso == "Effettivo":
+if tipo_tasso == "Effettivo (i già noto)":
     i_input = st.number_input(
-        "Inserisci tasso i",
+        "i effettivo nel periodo di composizione", # Etichetta aggiornata
         value=5.0 if usa_percentuale else 0.05,
         step=0.01 if usa_percentuale else 0.0001,
         format="%.4f"
@@ -31,13 +31,13 @@ if tipo_tasso == "Effettivo":
 
 else:
     r_input = st.number_input(
-        "Tasso nominale r",
+        "i nominale", # Etichetta aggiornata
         value=5.0 if usa_percentuale else 0.05,
         step=0.01 if usa_percentuale else 0.0001,
         format="%.4f"
     )
     m = st.number_input("Numero di composizioni m", value=1, step=1)
-    I = st.number_input("Durata periodo I", value=1.0, format="%.4f")
+    I = st.number_input("I durata periodo temporale", value=1.0, format="%.4f") # Etichetta aggiornata
 
     r = converti(r_input)
     i = (1 + r/m)**(m*I) - 1
@@ -47,30 +47,35 @@ else:
     else:
         st.write(f"Tasso effettivo calcolato: {i:.4f}")
 
-# --- Orizzonte ---
+# --- Orizzonte (Forzato a Intero) ---
 n = st.number_input("Orizzonte investimento (n)", value=1, step=1)
 
 # --- Fattori ---
 if i != 0:
     F_P = (1 + i)**n
     P_F = 1 / (1 + i)**n
-    A_P = (i * (1 + i)**n) / ((1 + i)**n - 1)
-    P_A = ((1 + i)**n - 1) / (i * (1 + i)**n)
-    F_A = ((1 + i)**n - 1) / i
-    A_F = i / ((1 + i)**n - 1)
+    A_P = (i * (1 + i)**n) / ((1 + i)**n - 1) if n > 0 else 0
+    P_A = ((1 + i)**n - 1) / (i * (1 + i)**n) if n > 0 else 0
+    F_A = ((1 + i)**n - 1) / i if n > 0 else 0
+    A_F = i / ((1 + i)**n - 1) if n > 0 else 0
 else:
     F_P = P_F = A_P = P_A = F_A = A_F = 0
 
 st.subheader("Fattori")
 
-st.write(f"F/P = {F_P:.4f}")
-st.write(f"P/F = {P_F:.4f}")
-st.write(f"A/P = {A_P:.4f}")
-st.write(f"P/A = {P_A:.4f}")
-st.write(f"F/A = {F_A:.4f}")
-st.write(f"A/F = {A_F:.4f}")
+# Layout a colonne per una visualizzazione più pulita
+col1, col2 = st.columns(2)
+with col1:
+    st.write(f"F/P = {F_P:.4f}")
+    st.write(f"P/F = {P_F:.4f}")
+    st.write(f"A/P = {A_P:.4f}")
+with col2:
+    st.write(f"P/A = {P_A:.4f}")
+    st.write(f"F/A = {F_A:.4f}")
+    st.write(f"A/F = {A_F:.4f}")
 
 # --- Scelte ---
+st.divider()
 inc = st.selectbox("Grandezza da calcolare", ["P", "F", "A"])
 nota = st.selectbox("Grandezza nota", ["P", "F", "A"])
 
@@ -108,5 +113,5 @@ else:
 
     if risultato is not None:
         st.subheader("Risultato")
-        st.write(formula)
+        st.info(formula)
         st.success(f"{inc} = {risultato:.4f}")
