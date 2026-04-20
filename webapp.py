@@ -2,7 +2,6 @@ import streamlit as st
 
 st.title("Calcolatore di Matematica Finanziaria")
 
-# --- Toggle modalità ---
 modalita = st.radio(
     "Modalità inserimento tasso",
     ["Decimale (0.05)", "Percentuale (5%)"]
@@ -10,7 +9,6 @@ modalita = st.radio(
 
 usa_percentuale = modalita == "Percentuale (5%)"
 
-# --- Scelta tasso (Testo pulito come richiesto) ---
 tipo_tasso = st.selectbox(
     "Tipo di tasso",
     ["Effettivo", "Nominale"]
@@ -19,7 +17,6 @@ tipo_tasso = st.selectbox(
 def converti(val):
     return val / 100 if usa_percentuale else val
 
-# --- Input tassi ---
 if tipo_tasso == "Effettivo":
     i_input = st.number_input(
         "i effettivo nel periodo di composizione", 
@@ -40,7 +37,6 @@ else:
     I = st.number_input("I durata periodo temporale", value=1.0, format="%.4f")
 
     r = converti(r_input)
-    # Calcolo del tasso effettivo i basato sulla formula del montante composto
     i = (1 + r/m)**(m*I) - 1
 
     if usa_percentuale:
@@ -48,10 +44,8 @@ else:
     else:
         st.write(f"Tasso effettivo calcolato: **{i:.4f}**")
 
-# --- Orizzonte (Intero) ---
 n = st.number_input("Orizzonte investimento (n)", value=1, step=1)
 
-# --- Fattori ---
 if i != 0:
     F_P = (1 + i)**n
     P_F = 1 / (1 + i)**n
@@ -73,7 +67,6 @@ with col2:
     st.write(f"F/A = **{F_A:.4f}**")
     st.write(f"A/F = **{A_F:.4f}**")
 
-# --- Scelte Finali ---
 st.divider()
 inc = st.selectbox("Grandezza da calcolare", ["P", "F", "A"])
 nota = st.selectbox("Grandezza nota", ["P", "F", "A"])
@@ -89,26 +82,26 @@ else:
     if inc == "F":
         if nota == "P":
             risultato = val * F_P
-            formula = "F = P \\cdot (F/P)"
+            formula = "F = P \\cdot (F/P,\\; i,\\; n)"
         elif nota == "A":
             risultato = val * F_A
-            formula = "F = A \\cdot (F/A)"
+            formula = "F = A \\cdot (F/A,\\; i,\\; n)"
 
     elif inc == "P":
         if nota == "F":
             risultato = val * P_F
-            formula = "P = F \\cdot (P/F)"
+            formula = "P = F \\cdot (P/F,\\; i,\\; n)"
         elif nota == "A":
             risultato = val * P_A
-            formula = "P = A \\cdot (P/A)"
+            formula = "P = A \\cdot (P/A,\\; i,\\; n)"
 
     elif inc == "A":
         if nota == "P":
             risultato = val * A_P
-            formula = "A = P \\cdot (A/P)"
+            formula = "A = P \\cdot (A/P,\\; i,\\; n)"
         elif nota == "F":
             risultato = val * A_F
-            formula = "A = F \\cdot (A/F)"
+            formula = "A = F \\cdot (A/F,\\; i,\\; n)"
 
     if risultato is not None:
         st.subheader("Risultato")
